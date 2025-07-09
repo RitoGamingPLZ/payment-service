@@ -1,0 +1,27 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install development dependencies
+RUN apk add --no-cache curl
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci
+
+# Copy source code
+COPY src ./src
+COPY prisma ./prisma
+
+# Generate Prisma client
+RUN npx prisma generate
+
+EXPOSE 3000
+
+ENV NODE_ENV=development
+
+# Use tsx for development with hot reload
+CMD ["npm", "run", "dev"]

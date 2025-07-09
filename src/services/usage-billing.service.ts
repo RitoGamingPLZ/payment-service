@@ -1,9 +1,8 @@
 import prisma from '../lib/prisma.js';
-import { create_audit_log } from './audit_service.js';
+import { create_audit_log } from './audit.service.js';
 
 export class UsageBillingService {
-  // Calculate simple usage billing for a metric (flat rate)
-  async calculate_usage_billing(app_id, metric_name, usage_quantity, rate_per_unit) {
+  async calculate_usage_billing(app_id: string, metric_name: string, usage_quantity: number, rate_per_unit: number) {
     try {
       const total_cost = usage_quantity * rate_per_unit;
       
@@ -20,13 +19,11 @@ export class UsageBillingService {
     }
   }
 
-  // Calculate monthly usage bill for a customer
-  async calculate_monthly_usage_bill(app_id, customer_id, billing_month, billing_year) {
+  async calculate_monthly_usage_bill(app_id: string, customer_id: string, billing_month: number, billing_year: number) {
     try {
       const start_date = new Date(billing_year, billing_month - 1, 1);
       const end_date = new Date(billing_year, billing_month, 0, 23, 59, 59);
       
-      // Get all usage records for the billing period
       const usage_records = await prisma.usage.findMany({
         where: {
           app_id,
@@ -38,8 +35,7 @@ export class UsageBillingService {
         }
       });
       
-      // Group usage by metric
-      const usage_by_metric = {};
+      const usage_by_metric: Record<string, number> = {};
       for (const record of usage_records) {
         if (!usage_by_metric[record.metric_name]) {
           usage_by_metric[record.metric_name] = 0;
@@ -47,10 +43,9 @@ export class UsageBillingService {
         usage_by_metric[record.metric_name] += record.quantity;
       }
       
-      // For now, using flat rate billing - this could be enhanced later
-      const billing_breakdown = {};
+      const billing_breakdown: Record<string, any> = {};
       let total_bill = 0;
-      const default_rate = 0.001; // Default rate per unit
+      const default_rate = 0.001;
       
       for (const [metric_name, total_usage] of Object.entries(usage_by_metric)) {
         const metric_billing = await this.calculate_usage_billing(app_id, metric_name, total_usage, default_rate);
@@ -89,8 +84,7 @@ export class UsageBillingService {
     }
   }
 
-  // Generate usage-based invoice
-  async generate_usage_invoice(app_id, customer_id, billing_period_start, billing_period_end) {
+  async generate_usage_invoice(app_id: string, customer_id: string, billing_period_start: Date, billing_period_end: Date) {
     try {
       const customer = await prisma.customer.findFirst({
         where: { id: customer_id, app_id }
@@ -100,7 +94,6 @@ export class UsageBillingService {
         throw new Error('Customer not found');
       }
       
-      // Get usage records for the billing period
       const usage_records = await prisma.usage.findMany({
         where: {
           app_id,
@@ -113,8 +106,7 @@ export class UsageBillingService {
         orderBy: { timestamp: 'asc' }
       });
       
-      // Group and calculate billing
-      const usage_by_metric = {};
+      const usage_by_metric: Record<string, { total_quantity: number; records: any[] }> = {};
       for (const record of usage_records) {
         if (!usage_by_metric[record.metric_name]) {
           usage_by_metric[record.metric_name] = {
@@ -126,10 +118,9 @@ export class UsageBillingService {
         usage_by_metric[record.metric_name].records.push(record);
       }
       
-      // Calculate billing for each metric
       const line_items = [];
       let subtotal = 0;
-      const default_rate = 0.001; // Default rate per unit
+      const default_rate = 0.001;
       
       for (const [metric_name, metric_data] of Object.entries(usage_by_metric)) {
         const billing = await this.calculate_usage_billing(app_id, metric_name, metric_data.total_quantity, default_rate);
@@ -144,7 +135,7 @@ export class UsageBillingService {
         subtotal += billing.total_cost;
       }
       
-      const tax_rate = 0.08; // This should be configurable
+      const tax_rate = 0.08;
       const tax_amount = subtotal * tax_rate;
       const total_amount = subtotal + tax_amount;
       
@@ -184,8 +175,7 @@ export class UsageBillingService {
     }
   }
 
-  // Get usage summary for billing period
-  async get_usage_summary(app_id, customer_id, billing_period_start, billing_period_end) {
+  async get_usage_summary(app_id: string, customer_id: string, billing_period_start: Date, billing_period_end: Date) {
     try {
       const usage_records = await prisma.usage.findMany({
         where: {
@@ -198,8 +188,7 @@ export class UsageBillingService {
         }
       });
       
-      // Group usage by metric
-      const usage_by_metric = {};
+      const usage_by_metric: Record<string, any> = {};
       for (const record of usage_records) {
         if (!usage_by_metric[record.metric_name]) {
           usage_by_metric[record.metric_name] = {
@@ -237,8 +226,7 @@ export class UsageBillingService {
     }
   }
 
-  // Calculate overage billing from quota plan
-  async calculate_overage_billing(app_id, customer_id, quota_plan_id, billing_period_start, billing_period_end) {
+  async calculate_overage_billing(app_id: string, customer_id: string, quota_plan_id: string, billing_period_start: Date, billing_period_end: Date) {
     try {
       const quota_plan = await prisma.quotaPlan.findFirst({
         where: { id: quota_plan_id, app_id }
@@ -248,15 +236,16 @@ export class UsageBillingService {
         return { total_amount: 0, breakdown: {} };
       }
       
-      const breakdown = {};
+      const breakdown: Record<string, any> = {};
       let total_amount = 0;
       
-      // Calculate overage for each metric
-      for (const metric_name of Object.keys(quota_plan.quotas)) {
-        const quota_limit = quota_plan.quotas[metric_name];
-        const overage_rate = quota_plan.overage_rates[metric_name] || 0;
+      const quotas = quota_plan.quotas as Record<string, number>;
+      const overage_rates = quota_plan.overage_rates as Record<string, number> || {};
+      
+      for (const metric_name of Object.keys(quotas)) {
+        const quota_limit = quotas[metric_name];
+        const overage_rate = overage_rates[metric_name] || 0;
         
-        // Get usage for this metric in billing period
         const usage_aggregate = await prisma.usage.aggregate({
           where: {
             app_id,
@@ -264,8 +253,8 @@ export class UsageBillingService {
             metric_name,
             quota_plan_id,
             timestamp: {
-              gte: new Date(billing_period_start),
-              lte: new Date(billing_period_end)
+              gte: billing_period_start,
+              lte: billing_period_end
             }
           },
           _sum: {

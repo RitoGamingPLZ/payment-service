@@ -46,10 +46,11 @@ export class PaymentService {
         data: {
           app_id,
           customer_id: payment_data.customer_id,
-          stripe_payment_intent_id: stripe_payment_intent.id,
+          stripe_payment_id: stripe_payment_intent.id,
           amount: payment_data.amount,
           currency: payment_data.currency,
           status: stripe_payment_intent.status,
+          payment_method: typeof stripe_payment_intent.payment_method === 'string' ? stripe_payment_intent.payment_method : 'unknown',
           description: payment_data.description,
           metadata: payment_data.metadata
         }
@@ -85,7 +86,7 @@ export class PaymentService {
       }
       
       const stripe_refund = await stripe_service.refund_payment(
-        payment.stripe_payment_intent_id,
+        payment.stripe_payment_id,
         refund_data.amount,
         refund_data.reason
       );
@@ -94,7 +95,10 @@ export class PaymentService {
         where: { id: refund_data.payment_id },
         data: {
           status: 'refunded',
-          refunded_amount: stripe_refund.amount
+          metadata: { 
+            ...payment.metadata as any,
+            refunded_amount: stripe_refund.amount
+          }
         }
       });
       
@@ -168,7 +172,7 @@ export class PaymentService {
   async update_payment_from_webhook(stripe_payment_intent_id: string, status: string, metadata?: Record<string, any>) {
     try {
       const payment = await prisma.payment.findFirst({
-        where: { stripe_payment_intent_id }
+        where: { stripe_payment_id: stripe_payment_intent_id }
       });
       
       if (!payment) {
@@ -180,7 +184,7 @@ export class PaymentService {
         where: { id: payment.id },
         data: {
           status,
-          metadata: metadata || payment.metadata
+          metadata: metadata || payment.metadata || {}
         }
       });
       

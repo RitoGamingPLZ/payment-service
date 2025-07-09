@@ -9,7 +9,7 @@ export class WebhookController {
     const sig = req.headers['stripe-signature'] as string;
     
     try {
-      const event = stripe_service.construct_webhook_event(req.body, sig);
+      const event = await stripe_service.construct_webhook_event(req.body, sig);
       
       console.log(`Received webhook event: ${event.type}`);
       

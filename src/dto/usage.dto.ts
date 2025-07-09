@@ -23,13 +23,6 @@ export class CreateUsageDto {
   @IsISO8601()
   timestamp?: string;
 
-  @IsOptional()
-  @IsISO8601()
-  period_start?: string;
-
-  @IsOptional()
-  @IsISO8601()
-  period_end?: string;
 
   @IsOptional()
   @IsString()
@@ -62,13 +55,6 @@ export class UsageRecordDto {
   @IsISO8601()
   timestamp?: string;
 
-  @IsOptional()
-  @IsISO8601()
-  period_start?: string;
-
-  @IsOptional()
-  @IsISO8601()
-  period_end?: string;
 
   @IsOptional()
   @IsString()
@@ -97,12 +83,6 @@ export class CreateCarryOverUsageDto {
   @IsInt()
   @Min(1)
   carry_over_quantity: number;
-
-  @IsISO8601()
-  new_period_start: string;
-
-  @IsISO8601()
-  new_period_end: string;
 
   @IsString()
   previous_period_id: string;
@@ -141,13 +121,6 @@ export class GetUsageQueryDto {
   @IsISO8601()
   end_date?: string;
 
-  @IsOptional()
-  @IsISO8601()
-  period_start?: string;
-
-  @IsOptional()
-  @IsISO8601()
-  period_end?: string;
 }
 
 export class GetUsageForPeriodQueryDto {

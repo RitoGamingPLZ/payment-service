@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import express from 'express';
-import { validateDto } from '../middlewares/validateDto.js';
+import { validateDto } from '../middleware/validation.middleware.js';
 import subscription_controller from '../controllers/subscription.controller.js';
 import { 
   CreateSubscriptionDto, 

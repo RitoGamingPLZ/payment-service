@@ -66,7 +66,7 @@ export class SubscriptionService {
           trial_end: stripe_subscription.trial_end ? new Date(stripe_subscription.trial_end * 1000) : null,
           current_period_start: new Date(stripe_subscription.current_period_start * 1000),
           current_period_end: new Date(stripe_subscription.current_period_end * 1000),
-          metadata: subscription_data.metadata
+          metadata: subscription_data.metadata || {} as any
         }
       });
       
@@ -181,7 +181,7 @@ export class SubscriptionService {
           price_id: update_data.price_id || subscription.price_id,
           quantity: update_data.quantity || subscription.quantity,
           quota_plan_id: update_data.quota_plan_id !== undefined ? update_data.quota_plan_id : subscription.quota_plan_id,
-          metadata: update_data.metadata || subscription.metadata
+          metadata: update_data.metadata || subscription.metadata || {}
         }
       });
       

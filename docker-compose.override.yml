@@ -1,0 +1,27 @@
+# Docker Compose override for local development
+# This file is automatically loaded by docker-compose
+
+version: '3.8'
+
+services:
+  payment-service:
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+    command: npm run dev
+
+  db:
+    environment:
+      - POSTGRES_DB=payment_db_dev
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+
+  redis:
+    volumes:
+      - redis_data_dev:/data
+
+volumes:
+  postgres_data_dev:
+  redis_data_dev:

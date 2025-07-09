@@ -7,9 +7,7 @@ interface CreateUsageData {
   quantity: number;
   subscription_id?: string;
   quota_plan_id?: string;
-  timestamp?: Date;
-  period_start?: Date;
-  period_end?: Date;
+  timestamp?: string | Date;
   carried_over_from_period?: string;
   metadata?: Record<string, any>;
 }
@@ -23,8 +21,6 @@ interface GetUsageOptions {
   quota_plan_id?: string;
   start_date?: string;
   end_date?: string;
-  period_start?: string;
-  period_end?: string;
 }
 
 export class UsageService {
@@ -67,8 +63,6 @@ export class UsageService {
           metric_name: usage_data.metric_name,
           quantity: usage_data.quantity,
           timestamp: usage_data.timestamp ? new Date(usage_data.timestamp) : new Date(),
-          period_start: usage_data.period_start ? new Date(usage_data.period_start) : undefined,
-          period_end: usage_data.period_end ? new Date(usage_data.period_end) : undefined,
           carried_over_from_period: usage_data.carried_over_from_period,
           metadata: usage_data.metadata
         }
@@ -112,8 +106,6 @@ export class UsageService {
         
         if (record.subscription_id) data.subscription_id = record.subscription_id;
         if (record.quota_plan_id) data.quota_plan_id = record.quota_plan_id;
-        if (record.period_start) data.period_start = new Date(record.period_start);
-        if (record.period_end) data.period_end = new Date(record.period_end);
         if (record.carried_over_from_period) data.carried_over_from_period = record.carried_over_from_period;
         if (record.metadata) data.metadata = record.metadata;
         
@@ -153,9 +145,7 @@ export class UsageService {
         subscription_id,
         quota_plan_id,
         start_date,
-        end_date,
-        period_start,
-        period_end
+        end_date
       } = options;
       
       const where: any = { app_id };
@@ -179,16 +169,6 @@ export class UsageService {
         }
         if (end_date) {
           where.timestamp.lte = new Date(end_date);
-        }
-      }
-      if (period_start || period_end) {
-        where.period_start = {};
-        if (period_start) {
-          where.period_start.gte = new Date(period_start);
-        }
-        if (period_end) {
-          where.period_end = {};
-          where.period_end.lte = new Date(period_end);
         }
       }
       
@@ -223,9 +203,7 @@ export class UsageService {
         subscription_id,
         quota_plan_id,
         start_date,
-        end_date,
-        period_start,
-        period_end
+        end_date
       } = options;
       
       const where: any = { app_id };
@@ -250,10 +228,6 @@ export class UsageService {
         if (end_date) {
           where.timestamp.lte = new Date(end_date);
         }
-      }
-      if (period_start && period_end) {
-        where.period_start = new Date(period_start);
-        where.period_end = new Date(period_end);
       }
       
       const usage_records = await prisma.usage.findMany({
@@ -307,8 +281,10 @@ export class UsageService {
           app_id,
           customer_id,
           metric_name,
-          period_start: new Date(period_start),
-          period_end: new Date(period_end)
+          timestamp: {
+            gte: new Date(period_start),
+            lte: new Date(period_end)
+          }
         },
         _sum: {
           quantity: true
@@ -322,7 +298,7 @@ export class UsageService {
     }
   }
 
-  async create_carry_over_usage(app_id: string, customer_id: string, metric_name: string, carry_over_quantity: number, new_period_start: string, new_period_end: string, previous_period_id: string) {
+  async create_carry_over_usage(app_id: string, customer_id: string, metric_name: string, carry_over_quantity: number, previous_period_id: string) {
     try {
       const carry_over_usage = await prisma.usage.create({
         data: {
@@ -331,8 +307,6 @@ export class UsageService {
           metric_name,
           quantity: -carry_over_quantity,
           timestamp: new Date(),
-          period_start: new Date(new_period_start),
-          period_end: new Date(new_period_end),
           carried_over_from_period: previous_period_id,
           metadata: {
             type: 'carry_over',

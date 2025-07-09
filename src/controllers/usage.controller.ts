@@ -69,7 +69,7 @@ export class UsageController {
 
   async get_usage_for_period(req: Request, res: Response) {
     try {
-      const query: GetUsageForPeriodQueryDto = req.query;
+      const query = req.query as any;
       
       const total_usage = await usage_service.get_usage_for_period(
         req.app_id, 
@@ -101,8 +101,6 @@ export class UsageController {
         carry_over_data.customer_id,
         carry_over_data.metric_name,
         carry_over_data.carry_over_quantity,
-        carry_over_data.new_period_start,
-        carry_over_data.new_period_end,
         carry_over_data.previous_period_id
       );
       

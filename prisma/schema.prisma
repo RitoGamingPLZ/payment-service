@@ -104,9 +104,6 @@ model Usage {
   quantity        Int      // Amount used in this single call/event
   timestamp       DateTime // When this usage occurred
   
-  // Period tracking (for efficient quota calculations)
-  period_start    DateTime // Start of the billing/quota period this usage belongs to
-  period_end      DateTime // End of the billing/quota period
   
   // Carry-over tracking
   carried_over_from_period String? // Previous period ID if this is carried over quota
@@ -121,10 +118,10 @@ model Usage {
   quota_plan   QuotaPlan?    @relation(fields: [quota_plan_id], references: [id])
   
   // Indexes for efficient quota checking (database-level performance)
-  @@index([customer_id, metric_name, period_start, period_end])
-  @@index([app_id, customer_id, timestamp])
-  @@index([customer_id, quota_plan_id, period_start])
-  @@index([app_id, metric_name, timestamp])
+  @@index([customer_id, metric_name, timestamp])
+  @@index([subscription_id, metric_name, timestamp])
+  @@index([quota_plan_id, metric_name, timestamp])
+  @@index([app_id, timestamp])
   
   @@map("usage")
 }

@@ -7,6 +7,11 @@ import rateLimit from 'express-rate-limit';
 import prisma from './lib/prisma.js';
 import { authenticate } from './middleware/auth.middleware.js';
 import customer_routes from './routes/customer.routes.js';
+import subscription_routes from './routes/subscription.routes.js';
+import payment_routes from './routes/payment.routes.js';
+import usage_routes from './routes/usage.routes.js';
+import webhook_routes from './routes/webhook.routes.js';
+import audit_routes from './routes/audit.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,8 +33,15 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Webhook routes (no authentication needed)
+app.use('/api/webhooks', webhook_routes);
+
 // API routes with authentication
 app.use('/api/customers', authenticate, customer_routes);
+app.use('/api/subscriptions', authenticate, subscription_routes);
+app.use('/api/payments', authenticate, payment_routes);
+app.use('/api/usage', authenticate, usage_routes);
+app.use('/api/audit', authenticate, audit_routes);
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
