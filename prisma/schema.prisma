@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model App {
+  id          String   @id @default(uuid())
+  name        String
+  api_key     String   @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  customers      Customer[]
+  subscriptions  Subscription[]
+  payments       Payment[]
+  usage          Usage[]
+  audit_logs     AuditLog[]
+  grace_periods  GracePeriod[]
+  quota_plans    QuotaPlan[]
+  
+  @@map("apps")
+}
+
+model Customer {
+  id                    String   @id @default(uuid())
+  app_id                String
+  stripe_customer_id    String   @unique
+  email                 String
+  name                  String?
+  metadata              Json?
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  
+  app           App            @relation(fields: [app_id], references: [id])
+  subscriptions Subscription[]
+  payments      Payment[]
+  usage         Usage[]
+  grace_periods GracePeriod[]
+  
+  @@map("customers")
+}
+
+model Subscription {
+  id                      String    @id @default(uuid())
+  app_id                  String
+  customer_id             String
+  stripe_subscription_id  String    @unique
+  status                  String
+  price_id                String
+  quantity                Int       @default(1)
+  quota_plan_id           String?   // Optional - links subscription to quota plan
+  trial_start             DateTime?
+  trial_end               DateTime?
+  current_period_start    DateTime
+  current_period_end      DateTime
+  cancel_at_period_end    Boolean   @default(false)
+  metadata                Json?
+  created_at              DateTime  @default(now())
+  updated_at              DateTime  @updatedAt
+  
+  app           App          @relation(fields: [app_id], references: [id])
+  customer      Customer     @relation(fields: [customer_id], references: [id])
+  quota_plan    QuotaPlan?   @relation(fields: [quota_plan_id], references: [id])
+  payments      Payment[]
+  usage         Usage[]
+  
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  app_id            String
+  customer_id       String
+  subscription_id   String?
+  stripe_payment_id String        @unique
+  amount            Int
+  currency          String
+  status            String
+  payment_method    String
+  description       String?
+  metadata          Json?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  
+  app          App           @relation(fields: [app_id], references: [id])
+  customer     Customer      @relation(fields: [customer_id], references: [id])
+  subscription Subscription? @relation(fields: [subscription_id], references: [id])
+  
+  @@map("payments")
+}
+
+model Usage {
+  id              String   @id @default(uuid())
+  app_id          String
+  customer_id     String
+  subscription_id String?
+  quota_plan_id   String?
+  
+  metric_name     String   // "api_calls", "storage_gb", "users"
+  quantity        Int      // Amount used in this single call/event
+  timestamp       DateTime // When this usage occurred
+  
+  // Period tracking (for efficient quota calculations)
+  period_start    DateTime // Start of the billing/quota period this usage belongs to
+  period_end      DateTime // End of the billing/quota period
+  
+  // Carry-over tracking
+  carried_over_from_period String? // Previous period ID if this is carried over quota
+  
+  metadata        Json?
+  created_at      DateTime @default(now())
+  
+  // Relationships
+  app          App           @relation(fields: [app_id], references: [id])
+  customer     Customer      @relation(fields: [customer_id], references: [id])
+  subscription Subscription? @relation(fields: [subscription_id], references: [id])
+  quota_plan   QuotaPlan?    @relation(fields: [quota_plan_id], references: [id])
+  
+  // Indexes for efficient quota checking (database-level performance)
+  @@index([customer_id, metric_name, period_start, period_end])
+  @@index([app_id, customer_id, timestamp])
+  @@index([customer_id, quota_plan_id, period_start])
+  @@index([app_id, metric_name, timestamp])
+  
+  @@map("usage")
+}
+
+model GracePeriod {
+  id          String   @id @default(uuid())
+  app_id      String
+  customer_id String
+  reason      String
+  start_date  DateTime
+  end_date    DateTime
+  status      String   @default("active")
+  metadata    Json?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  app      App      @relation(fields: [app_id], references: [id])
+  customer Customer @relation(fields: [customer_id], references: [id])
+  
+  @@map("grace_periods")
+}
+
+model AuditLog {
+  id               String   @id @default(uuid())
+  app_id           String
+  actor_id         String
+  action_type      String
+  target_type      String
+  target_id        String
+  payload_snapshot Json
+  created_at       DateTime @default(now())
+  
+  app App @relation(fields: [app_id], references: [id])
+  
+  @@map("audit_logs")
+}
+
+model QuotaPlan {
+  id             String   @id @default(uuid())
+  app_id         String
+  name           String
+  description    String?
+  billing_type   String   // "subscription", "usage", "hybrid"
+  quotas         Json     // { "api_calls": 1000, "storage_gb": 5, "users": 10 }
+  overage_rates  Json?    // { "api_calls": 0.001, "storage_gb": 0.10 }
+  reset_period   String   // "monthly", "yearly", "none"
+  carry_over     Boolean  @default(false) // Allow unused quota to carry over
+  max_carry_over Json?    // { "api_calls": 500 } - max carry-over per metric
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  
+  app           App            @relation(fields: [app_id], references: [id])
+  usage         Usage[]
+  subscriptions Subscription[] // Multiple subscriptions can use the same quota plan
+  
+  @@map("quota_plans")
+}
+
