@@ -132,14 +132,41 @@ export class StripeService {
 
   async construct_webhook_event(payload: any, signature: string) {
     try {
-      return stripe.webhooks.constructEvent(
+      const webhook_secret = process.env.STRIPE_WEBHOOK_SECRET;
+      
+      if (!webhook_secret) {
+        throw new Error('STRIPE_WEBHOOK_SECRET environment variable is not set');
+      }
+      
+      // Validate signature and construct event
+      const event = stripe.webhooks.constructEvent(
         payload,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET!
+        webhook_secret
       );
+      
+      // Additional validation: check event timestamp to prevent replay attacks
+      const event_timestamp = event.created;
+      const current_timestamp = Math.floor(Date.now() / 1000);
+      const max_age = 300; // 5 minutes
+      
+      if (current_timestamp - event_timestamp > max_age) {
+        throw new Error('Webhook event timestamp is too old');
+      }
+      
+      return event;
     } catch (error) {
       console.error('Stripe construct webhook event error:', error);
       throw error;
+    }
+  }
+  
+  async validate_webhook_signature(payload: any, signature: string): Promise<boolean> {
+    try {
+      await this.construct_webhook_event(payload, signature);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
