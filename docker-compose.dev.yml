@@ -22,8 +22,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     networks:
       - payment-network
     restart: unless-stopped
@@ -48,46 +46,9 @@ services:
       retries: 3
     restart: unless-stopped
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data_dev:/data
-    networks:
-      - payment-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-
-  adminer:
-    image: adminer:4
-    ports:
-      - "8080:8080"
-    networks:
-      - payment-network
-    depends_on:
-      - db
-    restart: unless-stopped
-
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    ports:
-      - "8081:8081"
-    networks:
-      - payment-network
-    depends_on:
-      - redis
-    restart: unless-stopped
 
 volumes:
   postgres_data_dev:
-  redis_data_dev:
 
 networks:
   payment-network:

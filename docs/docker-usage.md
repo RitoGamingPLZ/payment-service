@@ -26,9 +26,6 @@ docker-compose up --build
 |---------|------|-------------|
 | Payment Service | 3000 | Main application |
 | PostgreSQL | 5432 | Database |
-| Redis | 6379 | Cache/Session store |
-| Adminer | 8080 | Database management UI |
-| Redis Commander | 8081 | Redis management UI |
 
 ## Environment Variables
 
@@ -72,9 +69,6 @@ Required variables:
 
 # Connect to database
 docker-compose exec db psql -U postgres -d payment_db
-
-# View database in browser
-open http://localhost:8080
 ```
 
 ### Health Check

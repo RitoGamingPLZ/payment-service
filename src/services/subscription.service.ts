@@ -4,6 +4,7 @@ import stripe_service from './stripe.service.js';
 
 interface CreateSubscriptionData {
   customer_id: string;
+  subscription_plan_id?: string;
   price_id: string;
   quantity?: number;
   trial_period_days?: number;
@@ -35,6 +36,18 @@ export class SubscriptionService {
       if (!customer) {
         throw new Error('Customer not found');
       }
+
+      // Validate and get subscription plan if provided
+      let subscription_plan = null;
+      if (subscription_data.subscription_plan_id) {
+        subscription_plan = await prisma.subscriptionPlan.findFirst({
+          where: { id: subscription_data.subscription_plan_id, app_id }
+        });
+        
+        if (!subscription_plan) {
+          throw new Error('Subscription plan not found');
+        }
+      }
       
       const stripe_subscription = await stripe_service.create_subscription(
         customer.stripe_customer_id,
@@ -57,6 +70,7 @@ export class SubscriptionService {
         data: {
           app_id,
           customer_id: subscription_data.customer_id,
+          subscription_plan_id: subscription_data.subscription_plan_id,
           stripe_subscription_id: stripe_subscription.id,
           status: stripe_subscription.status,
           price_id: subscription_data.price_id,

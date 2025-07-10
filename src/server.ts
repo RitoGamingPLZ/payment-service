@@ -8,6 +8,7 @@ import prisma from './lib/prisma.js';
 import { authenticate } from './middleware/auth.middleware.js';
 import customer_routes from './routes/customer.routes.js';
 import subscription_routes from './routes/subscription.routes.js';
+import subscription_plan_routes from './routes/subscription-plan.routes.js';
 import payment_routes from './routes/payment.routes.js';
 import usage_routes from './routes/usage.routes.js';
 import webhook_routes from './routes/webhook.routes.js';
@@ -39,6 +40,7 @@ app.use('/api/webhooks', webhook_routes);
 // API routes with authentication
 app.use('/api/customers', authenticate, customer_routes);
 app.use('/api/subscriptions', authenticate, subscription_routes);
+app.use('/api/subscription-plans', authenticate, subscription_plan_routes);
 app.use('/api/payments', authenticate, payment_routes);
 app.use('/api/usage', authenticate, usage_routes);
 app.use('/api/audit', authenticate, audit_routes);

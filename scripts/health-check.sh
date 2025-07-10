@@ -30,13 +30,4 @@ else
     exit 1
 fi
 
-# Check Redis connection
-REDIS_STATUS=$(docker-compose exec -T redis redis-cli ping)
-if echo "$REDIS_STATUS" | grep -q "PONG"; then
-    echo "✅ Redis is healthy"
-else
-    echo "❌ Redis connection failed"
-    exit 1
-fi
-
 echo "🎉 All services are healthy!"

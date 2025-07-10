@@ -5,6 +5,10 @@ export class CreateSubscriptionDto {
   @IsString()
   customer_id: string;
 
+  @IsOptional()
+  @IsString()
+  subscription_plan_id?: string;
+
   @IsString()
   price_id: string;
 

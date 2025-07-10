@@ -247,6 +247,270 @@ const swaggerDefinition: SwaggerDefinition = {
         },
         required: ['id', 'app_id', 'customer_id', 'stripe_subscription_id', 'status', 'price_id']
       },
+      SubscriptionPlan: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'Subscription plan ID'
+          },
+          app_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'Application ID'
+          },
+          name: {
+            type: 'string',
+            description: 'Plan name',
+            example: 'Professional'
+          },
+          description: {
+            type: 'string',
+            description: 'Plan description',
+            example: 'Ideal for growing businesses'
+          },
+          slug: {
+            type: 'string',
+            description: 'URL-friendly plan identifier',
+            example: 'professional'
+          },
+          base_price: {
+            type: 'integer',
+            description: 'Base price in cents',
+            example: 9999
+          },
+          currency: {
+            type: 'string',
+            description: 'Currency code',
+            example: 'usd'
+          },
+          billing_period: {
+            type: 'string',
+            enum: ['monthly', 'yearly', 'weekly', 'daily'],
+            description: 'Billing frequency'
+          },
+          stripe_price_id: {
+            type: 'string',
+            description: 'Stripe Price ID'
+          },
+          stripe_product_id: {
+            type: 'string',
+            description: 'Stripe Product ID'
+          },
+          quota_plan_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'Associated quota plan ID'
+          },
+          trial_days: {
+            type: 'integer',
+            description: 'Free trial days',
+            example: 14
+          },
+          setup_fee: {
+            type: 'integer',
+            description: 'One-time setup fee in cents'
+          },
+          is_popular: {
+            type: 'boolean',
+            description: 'Show "Most Popular" badge'
+          },
+          is_featured: {
+            type: 'boolean',
+            description: 'Feature in marketing'
+          },
+          display_order: {
+            type: 'integer',
+            description: 'Sort order for display'
+          },
+          is_active: {
+            type: 'boolean',
+            description: 'Available for new subscriptions'
+          },
+          is_public: {
+            type: 'boolean',
+            description: 'Visible to customers'
+          },
+          quota_plan: {
+            $ref: '#/components/schemas/QuotaPlan'
+          },
+          metadata: {
+            type: 'object',
+            description: 'Additional plan metadata'
+          },
+          created_at: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Creation timestamp'
+          },
+          updated_at: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Last update timestamp'
+          }
+        },
+        required: ['id', 'app_id', 'name', 'slug', 'base_price', 'billing_period']
+      },
+      CreateSubscriptionPlan: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            description: 'Plan name',
+            example: 'Professional'
+          },
+          description: {
+            type: 'string',
+            description: 'Plan description',
+            example: 'Ideal for growing businesses'
+          },
+          slug: {
+            type: 'string',
+            description: 'URL-friendly plan identifier',
+            example: 'professional'
+          },
+          base_price: {
+            type: 'integer',
+            minimum: 0,
+            description: 'Base price in cents',
+            example: 9999
+          },
+          currency: {
+            type: 'string',
+            enum: ['usd', 'eur', 'gbp', 'cad', 'aud'],
+            description: 'Currency code'
+          },
+          billing_period: {
+            type: 'string',
+            enum: ['monthly', 'yearly', 'weekly', 'daily'],
+            description: 'Billing frequency'
+          },
+          stripe_price_id: {
+            type: 'string',
+            description: 'Stripe Price ID'
+          },
+          stripe_product_id: {
+            type: 'string',
+            description: 'Stripe Product ID'
+          },
+          quota_plan_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'Associated quota plan ID'
+          },
+          trial_days: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 365,
+            description: 'Free trial days'
+          },
+          setup_fee: {
+            type: 'integer',
+            minimum: 0,
+            description: 'One-time setup fee in cents'
+          },
+          is_popular: {
+            type: 'boolean',
+            description: 'Show "Most Popular" badge'
+          },
+          is_featured: {
+            type: 'boolean',
+            description: 'Feature in marketing'
+          },
+          display_order: {
+            type: 'integer',
+            minimum: 0,
+            description: 'Sort order for display'
+          },
+          metadata: {
+            type: 'object',
+            description: 'Additional plan metadata'
+          }
+        },
+        required: ['name', 'slug', 'base_price', 'billing_period']
+      },
+      UpdateSubscriptionPlan: {
+        type: 'object',
+        properties: {
+          name: {
+            type: 'string',
+            description: 'Plan name'
+          },
+          description: {
+            type: 'string',
+            description: 'Plan description'
+          },
+          slug: {
+            type: 'string',
+            description: 'URL-friendly plan identifier'
+          },
+          base_price: {
+            type: 'integer',
+            minimum: 0,
+            description: 'Base price in cents'
+          },
+          currency: {
+            type: 'string',
+            enum: ['usd', 'eur', 'gbp', 'cad', 'aud'],
+            description: 'Currency code'
+          },
+          billing_period: {
+            type: 'string',
+            enum: ['monthly', 'yearly', 'weekly', 'daily'],
+            description: 'Billing frequency'
+          },
+          stripe_price_id: {
+            type: 'string',
+            description: 'Stripe Price ID'
+          },
+          stripe_product_id: {
+            type: 'string',
+            description: 'Stripe Product ID'
+          },
+          quota_plan_id: {
+            type: 'string',
+            format: 'uuid',
+            description: 'Associated quota plan ID'
+          },
+          trial_days: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 365,
+            description: 'Free trial days'
+          },
+          setup_fee: {
+            type: 'integer',
+            minimum: 0,
+            description: 'One-time setup fee in cents'
+          },
+          is_popular: {
+            type: 'boolean',
+            description: 'Show "Most Popular" badge'
+          },
+          is_featured: {
+            type: 'boolean',
+            description: 'Feature in marketing'
+          },
+          display_order: {
+            type: 'integer',
+            minimum: 0,
+            description: 'Sort order for display'
+          },
+          is_active: {
+            type: 'boolean',
+            description: 'Available for new subscriptions'
+          },
+          is_public: {
+            type: 'boolean',
+            description: 'Visible to customers'
+          },
+          metadata: {
+            type: 'object',
+            description: 'Additional plan metadata'
+          }
+        }
+      },
       Usage: {
         type: 'object',
         properties: {
@@ -423,7 +687,8 @@ const options = {
   definition: swaggerDefinition,
   apis: [
     './src/routes/*.ts',
-    './src/controllers/*.ts'
+    './src/controllers/*.ts',
+    './src/docs/*.ts'
   ]
 };
 

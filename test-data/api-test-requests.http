@@ -1,0 +1,210 @@
+# Payment Service API Test Requests
+# Use with VS Code REST Client extension or similar HTTP client
+
+@baseUrl = http://localhost:3000
+@apiKey = sk_test_app_123_key_very_long_and_secure
+
+### 1. Create a new customer
+POST {{baseUrl}}/api/customers
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "email": "test@example.com",
+  "name": "Test User",
+  "metadata": {
+    "source": "api_test",
+    "plan": "starter"
+  }
+}
+
+### 2. Get customer by ID
+GET {{baseUrl}}/api/customers/cust_test_001
+X-API-Key: {{apiKey}}
+
+### 3. List all customers
+GET {{baseUrl}}/api/customers
+X-API-Key: {{apiKey}}
+
+### 4. Create a payment intent
+POST {{baseUrl}}/api/payments
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "customer_id": "cust_test_001",
+  "amount": 2999,
+  "currency": "usd",
+  "description": "Test payment",
+  "metadata": {
+    "order_id": "order_test_001",
+    "product": "subscription"
+  }
+}
+
+### 5. Get payment by ID
+GET {{baseUrl}}/api/payments/pay_test_001
+X-API-Key: {{apiKey}}
+
+### 6. List payments
+GET {{baseUrl}}/api/payments?customer_id=cust_test_001
+X-API-Key: {{apiKey}}
+
+### 6.1. Browse available subscription plans (public)
+GET {{baseUrl}}/api/subscription-plans/public
+X-API-Key: {{apiKey}}
+
+### 6.2. Browse monthly plans only
+GET {{baseUrl}}/api/subscription-plans/public?billing_period=monthly
+X-API-Key: {{apiKey}}
+
+### 6.3. Get specific plan by slug
+GET {{baseUrl}}/api/subscription-plans/public/starter
+X-API-Key: {{apiKey}}
+
+### 7. Create a subscription (using subscription plan)
+POST {{baseUrl}}/api/subscriptions
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "customer_id": "cust_test_001",
+  "subscription_plan_id": "subplan_starter_001",
+  "price_id": "price_starter_monthly",
+  "trial_period_days": 14,
+  "metadata": {
+    "plan_type": "starter",
+    "source": "api_test",
+    "selected_from_plans": true
+  }
+}
+
+### 8. Get subscription by ID
+GET {{baseUrl}}/api/subscriptions/sub_test_001
+X-API-Key: {{apiKey}}
+
+### 9. Update subscription
+PUT {{baseUrl}}/api/subscriptions/sub_test_001
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "cancel_at_period_end": true,
+  "metadata": {
+    "cancel_reason": "user_requested"
+  }
+}
+
+### 10. Cancel subscription
+DELETE {{baseUrl}}/api/subscriptions/sub_test_001
+X-API-Key: {{apiKey}}
+
+### 11. Check quota
+POST {{baseUrl}}/api/usage/check-quota
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "customer_id": "cust_test_001",
+  "metric_name": "api_calls",
+  "requested_quantity": 100
+}
+
+### 12. Consume quota
+POST {{baseUrl}}/api/usage/consume
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "customer_id": "cust_test_001",
+  "metric_name": "api_calls",
+  "quantity": 100,
+  "metadata": {
+    "endpoint": "/api/test",
+    "method": "POST"
+  }
+}
+
+### 13. Get usage by customer
+GET {{baseUrl}}/api/usage?customer_id=cust_test_001&metric_name=api_calls
+X-API-Key: {{apiKey}}
+
+### 14. Batch consume quota
+POST {{baseUrl}}/api/usage/batch-consume
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "customer_id": "cust_test_001",
+  "items": [
+    {
+      "metric_name": "api_calls",
+      "quantity": 50,
+      "metadata": {"endpoint": "/api/users"}
+    },
+    {
+      "metric_name": "storage_gb",
+      "quantity": 1,
+      "metadata": {"file_type": "image"}
+    }
+  ]
+}
+
+### 15. Get audit logs
+GET {{baseUrl}}/api/audit?limit=10&action_type=CONSUME_QUOTA
+X-API-Key: {{apiKey}}
+
+### 16. Get audit summary
+GET {{baseUrl}}/api/audit/summary
+X-API-Key: {{apiKey}}
+
+### 17. Test webhook endpoint (This will fail without proper signature)
+POST {{baseUrl}}/api/webhooks/stripe
+Content-Type: application/json
+User-Agent: Stripe/1.0 (+https://stripe.com/docs/webhooks)
+Stripe-Signature: t=1642723200,v1=invalid_signature
+
+{
+  "id": "evt_test_webhook",
+  "object": "event",
+  "type": "payment_intent.succeeded",
+  "data": {
+    "object": {
+      "id": "pi_test_123",
+      "amount": 2999,
+      "currency": "usd",
+      "status": "succeeded",
+      "metadata": {
+        "app_id": "app_test_123",
+        "customer_id": "cust_test_001"
+      }
+    }
+  }
+}
+
+### 18. Test invalid API key
+GET {{baseUrl}}/api/customers
+X-API-Key: invalid_key_test
+
+### 19. Test missing API key
+GET {{baseUrl}}/api/customers
+
+### 20. Test rate limiting (make multiple requests quickly)
+GET {{baseUrl}}/api/customers
+X-API-Key: {{apiKey}}
+
+###
+GET {{baseUrl}}/api/customers
+X-API-Key: {{apiKey}}
+
+###
+GET {{baseUrl}}/api/customers
+X-API-Key: {{apiKey}}
+
+###
+GET {{baseUrl}}/api/customers
+X-API-Key: {{apiKey}}
+
+###
+GET {{baseUrl}}/api/customers
+X-API-Key: {{apiKey}}

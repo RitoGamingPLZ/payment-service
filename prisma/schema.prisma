@@ -14,13 +14,14 @@ model App {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   
-  customers      Customer[]
-  subscriptions  Subscription[]
-  payments       Payment[]
-  usage          Usage[]
-  audit_logs     AuditLog[]
-  grace_periods  GracePeriod[]
-  quota_plans    QuotaPlan[]
+  customers           Customer[]
+  subscriptions       Subscription[]
+  payments            Payment[]
+  usage               Usage[]
+  audit_logs          AuditLog[]
+  grace_periods       GracePeriod[]
+  quota_plans         QuotaPlan[]
+  subscription_plans  SubscriptionPlan[]
   
   @@map("apps")
 }
@@ -48,6 +49,7 @@ model Subscription {
   id                      String    @id @default(uuid())
   app_id                  String
   customer_id             String
+  subscription_plan_id    String?   // Links to the plan template they selected
   stripe_subscription_id  String    @unique
   status                  String
   price_id                String
@@ -62,11 +64,12 @@ model Subscription {
   created_at              DateTime  @default(now())
   updated_at              DateTime  @updatedAt
   
-  app           App          @relation(fields: [app_id], references: [id])
-  customer      Customer     @relation(fields: [customer_id], references: [id])
-  quota_plan    QuotaPlan?   @relation(fields: [quota_plan_id], references: [id])
-  payments      Payment[]
-  usage         Usage[]
+  app                App               @relation(fields: [app_id], references: [id])
+  customer           Customer          @relation(fields: [customer_id], references: [id])
+  subscription_plan  SubscriptionPlan? @relation(fields: [subscription_plan_id], references: [id])
+  quota_plan         QuotaPlan?        @relation(fields: [quota_plan_id], references: [id])
+  payments           Payment[]
+  usage              Usage[]
   
   @@map("subscriptions")
 }
@@ -173,10 +176,56 @@ model QuotaPlan {
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
   
-  app           App            @relation(fields: [app_id], references: [id])
-  usage         Usage[]
-  subscriptions Subscription[] // Multiple subscriptions can use the same quota plan
+  app                 App                @relation(fields: [app_id], references: [id])
+  usage               Usage[]
+  subscriptions       Subscription[]     // Multiple subscriptions can use the same quota plan
+  subscription_plans  SubscriptionPlan[] // Multiple plans can use the same quota plan
   
   @@map("quota_plans")
 }
+
+// Subscription Plan Templates - What users see and compare before subscribing
+model SubscriptionPlan {
+  id              String   @id @default(uuid())
+  app_id          String
+  name            String   // "Starter", "Professional", "Enterprise"
+  description     String?  // "Perfect for small teams"
+  slug            String   // "starter", "pro", "enterprise" - for URLs
+  
+  // Pricing
+  base_price      Int      // Price in cents
+  currency        String   @default("usd")
+  billing_period  String   // "monthly", "yearly"
+  
+  // Stripe integration
+  stripe_price_id String?  // Links to Stripe Price object
+  stripe_product_id String? // Links to Stripe Product object
+  
+  // Plan configuration
+  quota_plan_id   String?  // Links to quota limits
+  trial_days      Int?     // Free trial period
+  setup_fee       Int?     // One-time setup fee in cents
+  
+  // Display and marketing
+  is_popular      Boolean  @default(false) // Show "Most Popular" badge
+  is_featured     Boolean  @default(false) // Feature in marketing
+  display_order   Int      @default(0)     // Sort order for display
+  
+  // Status
+  is_active       Boolean  @default(true)  // Available for new subscriptions
+  is_public       Boolean  @default(true)  // Visible to customers
+  
+  metadata        Json?    // Custom fields, marketing copy, etc.
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  // Relationships
+  app            App            @relation(fields: [app_id], references: [id])
+  quota_plan     QuotaPlan?     @relation(fields: [quota_plan_id], references: [id])
+  subscriptions  Subscription[] // Active subscriptions using this plan
+  
+  @@unique([app_id, slug])
+  @@map("subscription_plans")
+}
+
 

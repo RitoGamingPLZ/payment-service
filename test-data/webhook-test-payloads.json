@@ -1,0 +1,516 @@
+{
+  "payment_intent_succeeded": {
+    "id": "evt_test_payment_succeeded",
+    "object": "event",
+    "api_version": "2020-08-27",
+    "created": 1642723200,
+    "data": {
+      "object": {
+        "id": "pi_test_payment_succeeded_123",
+        "object": "payment_intent",
+        "amount": 2999,
+        "amount_capturable": 0,
+        "amount_received": 2999,
+        "application": null,
+        "application_fee_amount": null,
+        "canceled_at": null,
+        "cancellation_reason": null,
+        "capture_method": "automatic",
+        "charges": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/charges?payment_intent=pi_test_payment_succeeded_123"
+        },
+        "client_secret": "pi_test_payment_succeeded_123_secret_test",
+        "confirmation_method": "automatic",
+        "created": 1642723100,
+        "currency": "usd",
+        "customer": "cus_test_customer_123",
+        "description": "Monthly subscription payment",
+        "invoice": null,
+        "last_payment_error": null,
+        "livemode": false,
+        "metadata": {
+          "app_id": "app_test_123",
+          "customer_id": "cust_test_001",
+          "subscription_id": "sub_test_001"
+        },
+        "next_action": null,
+        "on_behalf_of": null,
+        "payment_method": null,
+        "payment_method_options": {},
+        "payment_method_types": ["card"],
+        "processing": null,
+        "receipt_email": "john@example.com",
+        "review": null,
+        "setup_future_usage": null,
+        "shipping": null,
+        "statement_descriptor": null,
+        "statement_descriptor_suffix": null,
+        "status": "succeeded",
+        "transfer_data": null,
+        "transfer_group": null
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_request_123",
+      "idempotency_key": null
+    },
+    "type": "payment_intent.succeeded"
+  },
+  "payment_intent_failed": {
+    "id": "evt_test_payment_failed",
+    "object": "event",
+    "api_version": "2020-08-27",
+    "created": 1642723300,
+    "data": {
+      "object": {
+        "id": "pi_test_payment_failed_456",
+        "object": "payment_intent",
+        "amount": 1999,
+        "amount_capturable": 0,
+        "amount_received": 0,
+        "application": null,
+        "application_fee_amount": null,
+        "canceled_at": null,
+        "cancellation_reason": null,
+        "capture_method": "automatic",
+        "charges": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/charges?payment_intent=pi_test_payment_failed_456"
+        },
+        "client_secret": "pi_test_payment_failed_456_secret_test",
+        "confirmation_method": "automatic",
+        "created": 1642723200,
+        "currency": "usd",
+        "customer": "cus_test_customer_456",
+        "description": "Failed payment attempt",
+        "invoice": null,
+        "last_payment_error": {
+          "charge": "ch_test_charge_failed",
+          "code": "card_declined",
+          "decline_code": "insufficient_funds",
+          "doc_url": "https://stripe.com/docs/error-codes/card-declined",
+          "message": "Your card was declined.",
+          "param": null,
+          "type": "card_error"
+        },
+        "livemode": false,
+        "metadata": {
+          "app_id": "app_demo_456",
+          "customer_id": "cust_test_004",
+          "subscription_id": "sub_test_004"
+        },
+        "next_action": null,
+        "on_behalf_of": null,
+        "payment_method": null,
+        "payment_method_options": {},
+        "payment_method_types": ["card"],
+        "processing": null,
+        "receipt_email": "bob@demo.com",
+        "review": null,
+        "setup_future_usage": null,
+        "shipping": null,
+        "statement_descriptor": null,
+        "statement_descriptor_suffix": null,
+        "status": "requires_payment_method",
+        "transfer_data": null,
+        "transfer_group": null
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_request_456",
+      "idempotency_key": null
+    },
+    "type": "payment_intent.payment_failed"
+  },
+  "invoice_payment_succeeded": {
+    "id": "evt_test_invoice_succeeded",
+    "object": "event",
+    "api_version": "2020-08-27",
+    "created": 1642723400,
+    "data": {
+      "object": {
+        "id": "in_test_invoice_succeeded_789",
+        "object": "invoice",
+        "account_country": "US",
+        "account_name": "Test Company",
+        "amount_due": 9999,
+        "amount_paid": 9999,
+        "amount_remaining": 0,
+        "application_fee_amount": null,
+        "attempt_count": 1,
+        "attempted": true,
+        "auto_advance": true,
+        "billing_reason": "subscription_cycle",
+        "charge": "ch_test_charge_succeeded",
+        "collection_method": "charge_automatically",
+        "created": 1642723300,
+        "currency": "usd",
+        "custom_fields": null,
+        "customer": "cus_test_customer_789",
+        "customer_address": null,
+        "customer_email": "jane@example.com",
+        "customer_name": "Jane Smith",
+        "customer_phone": null,
+        "customer_shipping": null,
+        "customer_tax_exempt": "none",
+        "default_payment_method": null,
+        "description": null,
+        "discount": null,
+        "due_date": null,
+        "ending_balance": 0,
+        "footer": null,
+        "hosted_invoice_url": "https://invoice.stripe.com/i/test",
+        "invoice_pdf": "https://pay.stripe.com/invoice/test/pdf",
+        "lines": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/invoices/in_test_invoice_succeeded_789/lines"
+        },
+        "livemode": false,
+        "metadata": {
+          "app_id": "app_test_123",
+          "customer_id": "cust_test_002",
+          "subscription_id": "sub_test_002"
+        },
+        "next_payment_attempt": null,
+        "number": "TEST-0001",
+        "paid": true,
+        "payment_intent": "pi_test_payment_intent_789",
+        "payment_method": null,
+        "payment_settings": {
+          "payment_method_options": null,
+          "payment_method_types": null
+        },
+        "period_end": 1645315200,
+        "period_start": 1642723200,
+        "post_payment_credit_notes_amount": 0,
+        "pre_payment_credit_notes_amount": 0,
+        "receipt_number": null,
+        "starting_balance": 0,
+        "statement_descriptor": null,
+        "status": "paid",
+        "status_transitions": {
+          "finalized_at": 1642723300,
+          "marked_uncollectible_at": null,
+          "paid_at": 1642723400,
+          "voided_at": null
+        },
+        "subscription": "sub_test_subscription_789",
+        "subtotal": 9999,
+        "tax": null,
+        "total": 9999,
+        "total_discount_amounts": [],
+        "total_tax_amounts": [],
+        "transfer_data": null,
+        "webhooks_delivered_at": 1642723400
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_request_789",
+      "idempotency_key": null
+    },
+    "type": "invoice.payment_succeeded"
+  },
+  "subscription_created": {
+    "id": "evt_test_subscription_created",
+    "object": "event",
+    "api_version": "2020-08-27",
+    "created": 1642723500,
+    "data": {
+      "object": {
+        "id": "sub_test_new_subscription_001",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "billing_cycle_anchor": 1642723500,
+        "billing_thresholds": null,
+        "cancel_at": null,
+        "cancel_at_period_end": false,
+        "canceled_at": null,
+        "collection_method": "charge_automatically",
+        "created": 1642723500,
+        "current_period_end": 1645315500,
+        "current_period_start": 1642723500,
+        "customer": "cus_test_new_customer_001",
+        "days_until_due": null,
+        "default_payment_method": null,
+        "default_source": null,
+        "default_tax_rates": [],
+        "discount": null,
+        "ended_at": null,
+        "items": {
+          "object": "list",
+          "data": [
+            {
+              "id": "si_test_item_001",
+              "object": "subscription_item",
+              "billing_thresholds": null,
+              "created": 1642723500,
+              "metadata": {},
+              "price": {
+                "id": "price_test_enterprise_001",
+                "object": "price",
+                "active": true,
+                "billing_scheme": "per_unit",
+                "created": 1642723400,
+                "currency": "usd",
+                "livemode": false,
+                "lookup_key": null,
+                "metadata": {},
+                "nickname": "Enterprise Plan",
+                "product": "prod_test_enterprise",
+                "recurring": {
+                  "aggregate_usage": null,
+                  "interval": "month",
+                  "interval_count": 1,
+                  "usage_type": "licensed"
+                },
+                "tax_behavior": "unspecified",
+                "tiers_mode": null,
+                "transform_quantity": null,
+                "type": "recurring",
+                "unit_amount": 49999,
+                "unit_amount_decimal": "49999"
+              },
+              "quantity": 1,
+              "subscription": "sub_test_new_subscription_001",
+              "tax_rates": []
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/subscription_items?subscription=sub_test_new_subscription_001"
+        },
+        "latest_invoice": "in_test_latest_invoice_001",
+        "livemode": false,
+        "metadata": {
+          "app_id": "app_beta_789",
+          "customer_id": "cust_test_new_001",
+          "plan_type": "enterprise"
+        },
+        "next_pending_invoice_item_invoice": null,
+        "pause_collection": null,
+        "pending_invoice_item_interval": null,
+        "pending_setup_intent": null,
+        "pending_update": null,
+        "schedule": null,
+        "start_date": 1642723500,
+        "status": "active",
+        "transfer_data": null,
+        "trial_end": null,
+        "trial_start": null
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_request_001",
+      "idempotency_key": null
+    },
+    "type": "customer.subscription.created"
+  },
+  "subscription_updated": {
+    "id": "evt_test_subscription_updated",
+    "object": "event",
+    "api_version": "2020-08-27",
+    "created": 1642723600,
+    "data": {
+      "object": {
+        "id": "sub_test_updated_subscription_002",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "billing_cycle_anchor": 1642723500,
+        "billing_thresholds": null,
+        "cancel_at": null,
+        "cancel_at_period_end": true,
+        "canceled_at": null,
+        "collection_method": "charge_automatically",
+        "created": 1642723500,
+        "current_period_end": 1645315500,
+        "current_period_start": 1642723500,
+        "customer": "cus_test_existing_customer_002",
+        "days_until_due": null,
+        "default_payment_method": null,
+        "default_source": null,
+        "default_tax_rates": [],
+        "discount": null,
+        "ended_at": null,
+        "items": {
+          "object": "list",
+          "data": [
+            {
+              "id": "si_test_item_002",
+              "object": "subscription_item",
+              "billing_thresholds": null,
+              "created": 1642723500,
+              "metadata": {},
+              "price": {
+                "id": "price_test_professional_002",
+                "object": "price",
+                "active": true,
+                "billing_scheme": "per_unit",
+                "created": 1642723400,
+                "currency": "usd",
+                "livemode": false,
+                "lookup_key": null,
+                "metadata": {},
+                "nickname": "Professional Plan",
+                "product": "prod_test_professional",
+                "recurring": {
+                  "aggregate_usage": null,
+                  "interval": "month",
+                  "interval_count": 1,
+                  "usage_type": "licensed"
+                },
+                "tax_behavior": "unspecified",
+                "tiers_mode": null,
+                "transform_quantity": null,
+                "type": "recurring",
+                "unit_amount": 9999,
+                "unit_amount_decimal": "9999"
+              },
+              "quantity": 1,
+              "subscription": "sub_test_updated_subscription_002",
+              "tax_rates": []
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/subscription_items?subscription=sub_test_updated_subscription_002"
+        },
+        "latest_invoice": "in_test_latest_invoice_002",
+        "livemode": false,
+        "metadata": {
+          "app_id": "app_test_123",
+          "customer_id": "cust_test_002",
+          "plan_type": "professional",
+          "cancel_reason": "downgrade_requested"
+        },
+        "next_pending_invoice_item_invoice": null,
+        "pause_collection": null,
+        "pending_invoice_item_interval": null,
+        "pending_setup_intent": null,
+        "pending_update": null,
+        "schedule": null,
+        "start_date": 1642723500,
+        "status": "active",
+        "transfer_data": null,
+        "trial_end": null,
+        "trial_start": null
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_request_002",
+      "idempotency_key": null
+    },
+    "type": "customer.subscription.updated"
+  },
+  "subscription_deleted": {
+    "id": "evt_test_subscription_deleted",
+    "object": "event",
+    "api_version": "2020-08-27",
+    "created": 1642723700,
+    "data": {
+      "object": {
+        "id": "sub_test_deleted_subscription_003",
+        "object": "subscription",
+        "application_fee_percent": null,
+        "billing_cycle_anchor": 1642723500,
+        "billing_thresholds": null,
+        "cancel_at": null,
+        "cancel_at_period_end": false,
+        "canceled_at": 1642723700,
+        "collection_method": "charge_automatically",
+        "created": 1642723500,
+        "current_period_end": 1645315500,
+        "current_period_start": 1642723500,
+        "customer": "cus_test_canceled_customer_003",
+        "days_until_due": null,
+        "default_payment_method": null,
+        "default_source": null,
+        "default_tax_rates": [],
+        "discount": null,
+        "ended_at": 1642723700,
+        "items": {
+          "object": "list",
+          "data": [
+            {
+              "id": "si_test_item_003",
+              "object": "subscription_item",
+              "billing_thresholds": null,
+              "created": 1642723500,
+              "metadata": {},
+              "price": {
+                "id": "price_test_starter_003",
+                "object": "price",
+                "active": true,
+                "billing_scheme": "per_unit",
+                "created": 1642723400,
+                "currency": "usd",
+                "livemode": false,
+                "lookup_key": null,
+                "metadata": {},
+                "nickname": "Starter Plan",
+                "product": "prod_test_starter",
+                "recurring": {
+                  "aggregate_usage": null,
+                  "interval": "month",
+                  "interval_count": 1,
+                  "usage_type": "licensed"
+                },
+                "tax_behavior": "unspecified",
+                "tiers_mode": null,
+                "transform_quantity": null,
+                "type": "recurring",
+                "unit_amount": 2999,
+                "unit_amount_decimal": "2999"
+              },
+              "quantity": 1,
+              "subscription": "sub_test_deleted_subscription_003",
+              "tax_rates": []
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/subscription_items?subscription=sub_test_deleted_subscription_003"
+        },
+        "latest_invoice": "in_test_latest_invoice_003",
+        "livemode": false,
+        "metadata": {
+          "app_id": "app_demo_456",
+          "customer_id": "cust_test_004",
+          "plan_type": "starter",
+          "cancel_reason": "user_requested"
+        },
+        "next_pending_invoice_item_invoice": null,
+        "pause_collection": null,
+        "pending_invoice_item_interval": null,
+        "pending_setup_intent": null,
+        "pending_update": null,
+        "schedule": null,
+        "start_date": 1642723500,
+        "status": "canceled",
+        "transfer_data": null,
+        "trial_end": null,
+        "trial_start": null
+      }
+    },
+    "livemode": false,
+    "pending_webhooks": 1,
+    "request": {
+      "id": "req_test_request_003",
+      "idempotency_key": null
+    },
+    "type": "customer.subscription.deleted"
+  }
+}
